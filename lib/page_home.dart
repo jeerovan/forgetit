@@ -19,15 +19,7 @@ class HomePageState extends State<HomePage> {
   final TextEditingController searchController = TextEditingController();
   ModelItem lastAdded = ModelItem.init();
   List<ModelItem> items = [];
-  @override
-  void initState() {
-    super.initState();
-    loadLastAddedItem();
-  }
-  @override
-  void dispose(){
-    super.dispose();
-  }
+  
   void loadLastAddedItem() async {
     ModelItem? item = await ModelItem.getLastAdded();
     if(item != null){
@@ -43,42 +35,27 @@ class HomePageState extends State<HomePage> {
       )).then((_) => loadLastAddedItem() // refresh recently added entries
       );
   }
-
+  void resetSearch(){
+    items = [];
+    searchController.clear();
+    setState(() {
+      
+    });
+  }
+  @override
+  void initState() {
+    super.initState();
+    loadLastAddedItem();
+  }
+  @override
+  void dispose(){
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-            icon: const Icon(Icons.face),
-            color: Colors.purple,
-            onPressed: () {
-              Navigator.of(context)
-                .push(MaterialPageRoute(
-                  builder: (context) => const BlankPage(),
-                ));
-          }
-        ),
-        title: TextField(
-          controller: searchController,
-          autofocus: true,
-          decoration: InputDecoration(
-            hintText: 'Search by a tag',
-            suffixIcon: searchController.text.isNotEmpty
-            ? IconButton(
-                icon: const Icon(Icons.clear),
-                onPressed: () => setState(() {
-                  searchController.clear();
-                }),
-              )
-            : null,
-          ),
-          onChanged: (value) {
-            if(searchController.text.length < 2){
-              setState(() {
-              });
-            }
-          },
-        ),
+        title: const Text("Forget It"),
         actions: [
           if(debug)IconButton(
             icon: const Icon(Icons.reorder), 
@@ -91,12 +68,60 @@ class HomePageState extends State<HomePage> {
         ],
       ),
       body: itemsView(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          addEditItem(0);
-        },
-        shape: const CircleBorder(),
-        child: const Icon(Icons.add),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          children: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.face),
+              color: Theme.of(context).colorScheme.primary,
+              onPressed: () {
+                Navigator.of(context)
+                  .push(MaterialPageRoute(
+                    builder: (context) => const BlankPage(),
+                  ));
+              },
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: TextField(
+                  controller: searchController,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    hintText: 'Search by a tag',
+                    suffixIcon: searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear,),
+                          onPressed: () => setState(() {
+                            searchController.clear();
+                          }),
+                        )
+                      : null,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.all(16.0),
+                  ),
+                  onChanged: (value) {
+                    if(searchController.text.length < 2){
+                      setState(() {
+                      });
+                    }
+                  },
+                ),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.add),
+              color: Theme.of(context).colorScheme.primary,
+              onPressed: () {
+                addEditItem(0);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

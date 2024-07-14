@@ -86,6 +86,14 @@ class AddEditItemState extends State<AddEditItem> {
       itemTagController.clear();
     });
   }
+  void removeTag(ModelTag tag) async {
+    if(item.id != null){
+      await ModelItemTag.removeForItemIdTagId(item.id!, tag.id!);
+    }
+    setState(() {
+      tags.remove(tag);
+    });
+  }
   void saveItem() async {
     if(itemChanged){
       String itemTitle = itemTitleController.text;
@@ -127,92 +135,95 @@ class AddEditItemState extends State<AddEditItem> {
       appBar: AppBar(
         title: const Text("Add/Edit Item"),
       ),
-      body: Column(
-        children: [
-          GestureDetector(
-            onTap: () async { await setImage();},
-            child: SizedBox(
-              width: 200,
-              height: 200,
-              child: Card(
-                child: Center(
-                  child: image != null
-                        ? Image.memory(image!)
-                        : const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text("Tap to take a picutre with surroundings to locate it easily"),
-                        ),
-                  
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            GestureDetector(
+              onTap: () async { await setImage();},
+              child: SizedBox(
+                width: 150,
+                height: 150,
+                child: Card(
+                  child: Center(
+                    child: image != null
+                          ? Image.memory(image!)
+                          : const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text("Tap to take a picutre with surroundings to locate it easily"),
+                          ),
+                    
+                  ),
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: itemTitleController,
-              autofocus: true,
-              decoration: const InputDecoration(
-                hintText: 'Directions to locate', // Placeholder
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: itemTitleController,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'Directions to locate', // Placeholder
+                ),
+                onChanged: (value) {
+                  itemChanged = true;
+                },
               ),
-              onChanged: (value) {
-                itemChanged = true;
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Wrap(
+                spacing: 10.0,
+                runSpacing: 10.0,
+                children: tags.map((tag) {
+                  return Chip(
+                    label: Text(tag.title),
+                    deleteIcon: Icon(Icons.clear,size:16.0,color: Theme.of(context).colorScheme.primary,),
+                    onDeleted: () {
+                      removeTag(tag);
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          children: <Widget>[
+            IconButton(
+              color: Theme.of(context).colorScheme.primary,
+              icon: const Icon(Icons.check),
+              onPressed: () {
+                saveItem();
               },
             ),
-          ),
-          Expanded(child: ListView(children: tagsView(tags),),),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: itemTagController,
-                    textCapitalization: TextCapitalization.characters,
-                    decoration: InputDecoration(
-                      hintText: 'Add Tags', // Placeholder
-                      suffixIcon: Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: IconButton(
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: TextField(
+                  controller: itemTagController,
+                  decoration: InputDecoration(
+                    hintText: 'Add a tag',
+                    suffixIcon: IconButton(
+                          icon: const Icon(Icons.publish,),
+                          color: Theme.of(context).colorScheme.primary,
                           onPressed: (){
                             addTag();
                           },
-                          icon: const Icon(Icons.publish,),
                         ),
-                      ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16.0),
                     ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.all(16.0),
                   ),
-                ), 
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                FloatingActionButton.small(
-                  heroTag: "cancel",
-                  onPressed: (){
-                    Navigator.of(context).pop();
-                  },
-                  shape: const CircleBorder(),
-                  backgroundColor: Colors.white,
-                  child: const Icon(Icons.clear,color: Colors.grey,),
                 ),
-                const SizedBox(width: 25,),
-                FloatingActionButton(
-                  heroTag: "submit",
-                  onPressed: (){
-                    saveItem();
-                  },
-                  shape: const CircleBorder(),
-                  child: const Icon(Icons.check),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
