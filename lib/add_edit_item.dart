@@ -22,14 +22,39 @@ class AddEditItem extends StatefulWidget {
 class AddEditItemState extends State<AddEditItem> {
   final TextEditingController itemTitleController = TextEditingController();
   final TextEditingController itemTagController = TextEditingController();
+
   ModelItem item = ModelItem.init();
   List<ModelTag> tags = [];
+  
   String? imagePath;
   Uint8List? image;
+  
   bool itemChanged = false;
+  
+  OverlayEntry? entry;
+  final FocusNode tagFocusNode = FocusNode();
+  final GlobalKey tagTextFieldKey = GlobalKey();
+  List<ModelTag> availableTags = [];
+  
   int profileId = ModelSetting.getForKey("profile", 1);
 
   void initData() async {
+    tagFocusNode.addListener(() {
+      if (tagFocusNode.hasFocus){
+        if (itemTagController.text.isNotEmpty){
+          if(availableTags.isNotEmpty){
+            entry?.remove();
+            showOverlay();
+          } else {
+            hideOverlay();
+          }
+        } else {
+          hideOverlay();
+        }
+      } else if(availableTags.isEmpty){
+        resetSearch();
+      }
+    });
     ModelItem? existingItem = await ModelItem.get(widget.itemId);
     if(existingItem != null){
       item = existingItem;
@@ -77,13 +102,83 @@ class AddEditItemState extends State<AddEditItem> {
       
     });
   }
-  void addTag() async {
+  void updateAvailableTags(String query) async {
+    if (query.isNotEmpty && query.length > 1){
+      availableTags = await ModelTag.search(query);
+      if(availableTags.isNotEmpty){
+        setState(() {
+            entry?.remove();
+            showOverlay();
+        });
+      } else {
+        hideOverlay();
+      }
+    } else {
+      hideOverlay();
+    }
+  }
+  void showOverlay(){
+    final overlay = Overlay.of(context);
+    final renderBox = tagTextFieldKey.currentContext?.findRenderObject() as RenderBox;
+    final size = renderBox.size;
+    final offset = renderBox.localToGlobal(Offset.zero);
+    double overlayHeight = 200;
+    entry = OverlayEntry(
+      builder: (context) => 
+        Positioned(
+          left: offset.dx,
+          height: overlayHeight,
+          top: offset.dy - overlayHeight,
+          width: size.width,
+          child: 
+            Material(
+              borderRadius: BorderRadius.circular(10),
+              elevation: 8,
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Wrap(
+                    spacing: 10.0,
+                    runSpacing: 10.0,
+                    children: availableTags.map((tag) {
+                      return GestureDetector(
+                        onTap: () => addAvailableTag(tag),
+                        child: Chip(
+                          label: Text(tag.title),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            ),
+        ),
+    );
+    overlay.insert(entry!);
+  }
+  void resetSearch(){
+    hideOverlay();
+    itemTagController.clear();
+    availableTags = [];
+  }
+  void hideOverlay(){
+    entry?.remove();
+    entry = null;
+  }
+  void addAvailableTag(ModelTag tag){
     itemChanged = true;
-    String tagTitle = itemTagController.text;
+    setState(() {
+      checkAddTag(tag);
+    });
+  }
+  void addNewTag() async {
+    if(itemTagController.text.isEmpty)return;
+    itemChanged = true;
+    String tagTitle = itemTagController.text.trim();
     ModelTag tag = ModelTag(title: tagTitle);
     setState(() {
-      tags.add(tag);
-      itemTagController.clear();
+      checkAddTag(tag);
+      resetSearch();
     });
   }
   void removeTag(ModelTag tag) async {
@@ -93,6 +188,18 @@ class AddEditItemState extends State<AddEditItem> {
     setState(() {
       tags.remove(tag);
     });
+  }
+  void checkAddTag(ModelTag newTag){
+    bool exist = false;
+    for(ModelTag tag in tags){
+      if (tag.title == newTag.title){
+        exist = true;
+        break;
+      }
+    }
+    if(!exist){
+      tags.add(newTag);
+    }
   }
   void saveItem() async {
     if(itemChanged){
@@ -127,6 +234,10 @@ class AddEditItemState extends State<AddEditItem> {
   }
   @override
   void dispose(){
+    hideOverlay();
+    itemTitleController.dispose();
+    itemTagController.dispose();
+    tagFocusNode.dispose();
     super.dispose();
   }
   @override
@@ -175,12 +286,11 @@ class AddEditItemState extends State<AddEditItem> {
                 spacing: 10.0,
                 runSpacing: 10.0,
                 children: tags.map((tag) {
-                  return Chip(
-                    label: Text(tag.title),
-                    deleteIcon: Icon(Icons.clear,size:16.0,color: Theme.of(context).colorScheme.primary,),
-                    onDeleted: () {
-                      removeTag(tag);
-                    },
+                  return GestureDetector(
+                    onTap: () => removeTag(tag),
+                    child: Chip(
+                      label: Text(tag.title),
+                    ),
                   );
                 }).toList(),
               ),
@@ -202,14 +312,16 @@ class AddEditItemState extends State<AddEditItem> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4.0),
                 child: TextField(
+                  key: tagTextFieldKey,
                   controller: itemTagController,
+                  focusNode: tagFocusNode,
                   decoration: InputDecoration(
                     hintText: 'Add a tag',
                     suffixIcon: IconButton(
                           icon: const Icon(Icons.publish,),
                           color: Theme.of(context).colorScheme.primary,
                           onPressed: (){
-                            addTag();
+                            addNewTag();
                           },
                         ),
                     border: OutlineInputBorder(
@@ -219,6 +331,9 @@ class AddEditItemState extends State<AddEditItem> {
                     fillColor: Colors.white,
                     contentPadding: const EdgeInsets.all(16.0),
                   ),
+                  onChanged: (value) {
+                    updateAvailableTags(value);
+                  },
                 ),
               ),
             ),

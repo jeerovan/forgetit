@@ -24,6 +24,15 @@ class ModelTag {
       title:map.containsKey('title') ? map['title'] : ""
     );
   }
+  static Future<List<ModelTag>> search(String query) async {
+    final dbHelper = DatabaseHelper.instance;
+    final db = await dbHelper.database;
+    List<Map<String,dynamic>> rows = await db.query(
+      'tag',
+      where: 'title LIKE ?',
+      whereArgs: ['%$query%']);
+    return await Future.wait(rows.map((map) => fromMap(map)));
+  }
   static Future<ModelTag?> get(int id) async{
     final dbHelper = DatabaseHelper.instance;
     List<Map<String,dynamic>> list = await dbHelper.queryOne("tag", id);
