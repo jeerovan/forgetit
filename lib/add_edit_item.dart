@@ -221,11 +221,15 @@ class AddEditItemState extends State<AddEditItem> {
           int? tagId = tag.id;
           tagId ??= await tag.insert();
           tag.id = tagId;
-          await ModelItemTag.checkAddItemTag(itemId, tagId);
+          await ModelItemTag.checkAddItemTag(itemId, tagId,);
         }
       }
     }
     if(mounted)Navigator.of(context).pop();
+  }
+  void deleteItem(){
+    item.delete();
+    Navigator.of(context).pop();
   }
   @override
   void initState() {
@@ -245,6 +249,9 @@ class AddEditItemState extends State<AddEditItem> {
     return  Scaffold(
       appBar: AppBar(
         title: const Text("Add/Edit Item"),
+        actions: [
+          if (widget.itemId > 0) IconButton(onPressed: deleteItem, icon: const Icon(Icons.delete,color: Colors.red,))
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(

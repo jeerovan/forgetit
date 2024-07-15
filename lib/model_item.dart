@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 
@@ -44,6 +43,20 @@ class ModelItem {
       title:map.containsKey('title') ? map['title'] : "",
       image:map.containsKey('image') ? map['image'] : "",
     );
+  }
+  static Future<List<ModelItem>> getForTag(String tag,int profileId) async {
+    final dbHelper = DatabaseHelper.instance;
+    final db = await dbHelper.database;
+    String sql = '''
+      SELECT DISTINCT item.*
+      FROM item
+      INNER JOIN itemtag ON itemtag.item_id == item.id
+      INNER JOIN tag ON tag.id == itemtag.tag_id
+      WHERE item.profile_id == ?
+        AND tag.title LIKE ?
+    ''';
+    List<Map<String,dynamic>> rows = await db.rawQuery(sql,[profileId,'%$tag%']);
+    return await Future.wait(rows.map((map) => fromMap(map)));
   }
   static Future<ModelItem?> getLastAdded() async{
     final dbHelper = DatabaseHelper.instance;

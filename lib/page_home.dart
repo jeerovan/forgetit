@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:forgetit/add_edit_item.dart';
 import 'package:forgetit/globals.dart';
 import 'package:forgetit/model_item.dart';
+import 'package:forgetit/model_setting.dart';
 
 import 'page_db.dart';
 
-bool debug = true;
+bool debug = false;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -39,8 +40,15 @@ class HomePageState extends State<HomePage> {
     items = [];
     searchController.clear();
     setState(() {
-      
     });
+  }
+  void searchItems(String query) async {
+    if (query.length > 1){
+      int profileId = ModelSetting.getForKey("profile", 1);
+      items = await ModelItem.getForTag(query, profileId);
+    } else {
+      items = [];
+    }
   }
   @override
   void initState() {
@@ -92,9 +100,7 @@ class HomePageState extends State<HomePage> {
                     suffixIcon: searchController.text.isNotEmpty
                       ? IconButton(
                           icon: const Icon(Icons.clear,),
-                          onPressed: () => setState(() {
-                            searchController.clear();
-                          }),
+                          onPressed: () => resetSearch(),
                         )
                       : null,
                     border: OutlineInputBorder(
@@ -105,10 +111,9 @@ class HomePageState extends State<HomePage> {
                     contentPadding: const EdgeInsets.all(16.0),
                   ),
                   onChanged: (value) {
-                    if(searchController.text.length < 2){
-                      setState(() {
-                      });
-                    }
+                    setState(() {
+                      searchItems(value);
+                    });
                   },
                 ),
               ),
@@ -155,7 +160,26 @@ class HomePageState extends State<HomePage> {
           ],
         );
       }
+    } else {
+      return SingleChildScrollView(
+        child: Center(
+          child: Wrap(
+            spacing: 10.0,
+            runSpacing: 10,
+            children: items.map((item) {
+              return SizedBox(
+                    width: 150,
+                    height: 150,
+                    child: Card(
+                      child: Center(
+                        child: Image.memory(item.image),
+                      ),
+                    ),
+                  );
+            }).toList(),
+          ),
+        ),
+      );
     }
-    return const Scaffold();
   }
 }

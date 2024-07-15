@@ -52,9 +52,6 @@ class DatabaseHelper {
       )
     ''');
     await db.execute('''
-      CREATE INDEX idx_item_title ON item(title)
-    ''');
-    await db.execute('''
       CREATE TABLE tag (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         title TEXT NOT NULL,
