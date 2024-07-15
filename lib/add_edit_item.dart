@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:forgetit/globals.dart';
 import 'package:forgetit/model_item.dart';
 import 'package:forgetit/model_setting.dart';
@@ -10,6 +11,8 @@ import 'package:forgetit/model_tag.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as pimg;
 import 'model_item_tag.dart';
+
+bool mobile = Platform.isAndroid;
 
 class AddEditItem extends StatefulWidget {
   final int itemId;
@@ -66,10 +69,8 @@ class AddEditItemState extends State<AddEditItem> {
   }
   Future<void> _takePicture() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
-    String? tempPath;
     if (pickedFile != null) {
-      tempPath = pickedFile.path;
-      var bytes = await File(tempPath).readAsBytes();
+      var bytes = await File(pickedFile.path).readAsBytes();
       pimg.Image? src = pimg.decodeImage(bytes);
       if(src != null){
         var cropSize = min(src.width, src.height);
@@ -78,14 +79,13 @@ class AddEditItemState extends State<AddEditItem> {
         int offsetY = (src.height - cropSize) ~/ 2;
         pimg.Image destImage =
           pimg.copyCrop(src, x:offsetX, y:offsetY, width:cropSize, height:cropSize);
-        File(tempPath).writeAsBytesSync(pimg.encodePng(destImage));
+        image = Uint8List.fromList(pimg.encodePng(destImage));
       }
       setState(() {
-        imagePath = tempPath;
       });
     }
   }
-  Future<void> setImage() async {
+  Future<void> _setImage() async {
     int width = 1024;
     int height = 1024;
     final pimg.Image blankImage = pimg.Image(width:width,height: height);
@@ -253,99 +253,112 @@ class AddEditItemState extends State<AddEditItem> {
           if (widget.itemId > 0) IconButton(onPressed: deleteItem, icon: const Icon(Icons.delete,color: Colors.red,))
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            GestureDetector(
-              onTap: () async { await setImage();},
-              child: SizedBox(
-                width: 150,
-                height: 150,
-                child: Card(
-                  child: Center(
-                    child: image != null
-                          ? Image.memory(image!)
-                          : const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Text("Tap to take a picutre with surroundings to locate it easily"),
-                          ),
-                    
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: itemTitleController,
-                autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'Directions to locate', // Placeholder
-                ),
-                onChanged: (value) {
-                  itemChanged = true;
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Wrap(
-                spacing: 10.0,
-                runSpacing: 10.0,
-                children: tags.map((tag) {
-                  return GestureDetector(
-                    onTap: () => removeTag(tag),
-                    child: Chip(
-                      label: Text(tag.title),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Row(
-          children: <Widget>[
-            IconButton(
-              color: Theme.of(context).colorScheme.primary,
-              icon: const Icon(Icons.check),
-              onPressed: () {
-                saveItem();
-              },
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: TextField(
-                  key: tagTextFieldKey,
-                  controller: itemTagController,
-                  focusNode: tagFocusNode,
-                  decoration: InputDecoration(
-                    hintText: 'Add a tag',
-                    suffixIcon: IconButton(
-                          icon: const Icon(Icons.publish,),
-                          color: Theme.of(context).colorScheme.primary,
-                          onPressed: (){
-                            addNewTag();
-                          },
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      if(mobile){
+                        await _takePicture();
+                      } else {
+                        _setImage();
+                      }
+                    },
+                    child: SizedBox(
+                      width: 150,
+                      height: 150,
+                      child: Card(
+                        child: Center(
+                          child: image != null
+                                ? Image.memory(image!)
+                                : const Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text("Tap to take a picutre with surroundings to locate it easily"),
+                                ),
+                          
                         ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16.0),
+                      ),
                     ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.all(16.0),
                   ),
-                  onChanged: (value) {
-                    updateAvailableTags(value);
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      controller: itemTitleController,
+                      autofocus: true,
+                      decoration: const InputDecoration(
+                        hintText: 'Directions to locate', // Placeholder
+                      ),
+                      onChanged: (value) {
+                        itemChanged = true;
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Wrap(
+                      spacing: 10.0,
+                      runSpacing: 10.0,
+                      children: tags.map((tag) {
+                        return GestureDetector(
+                          onTap: () => removeTag(tag),
+                          child: Chip(
+                            label: Text(tag.title),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: <Widget>[
+                IconButton(
+                  color: Theme.of(context).colorScheme.primary,
+                  icon: const Icon(Icons.check),
+                  onPressed: () {
+                    saveItem();
                   },
                 ),
-              ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: TextField(
+                      key: tagTextFieldKey,
+                      controller: itemTagController,
+                      focusNode: tagFocusNode,
+                      decoration: InputDecoration(
+                        hintText: 'Add a tag',
+                        suffixIcon: IconButton(
+                              icon: const Icon(Icons.publish,),
+                              color: Theme.of(context).colorScheme.primary,
+                              onPressed: (){
+                                addNewTag();
+                              },
+                            ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.all(16.0),
+                      ),
+                      onChanged: (value) {
+                        updateAvailableTags(value);
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -75,58 +75,67 @@ class HomePageState extends State<HomePage> {
           })
         ],
       ),
-      body: itemsView(),
-      bottomNavigationBar: BottomAppBar(
-        child: Row(
-          children: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.face),
-              color: Theme.of(context).colorScheme.primary,
-              onPressed: () {
-                Navigator.of(context)
-                  .push(MaterialPageRoute(
-                    builder: (context) => const BlankPage(),
-                  ));
-              },
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+                child: itemsView(),
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                child: TextField(
-                  controller: searchController,
-                  autofocus: true,
-                  decoration: InputDecoration(
-                    hintText: 'Search by a tag',
-                    suffixIcon: searchController.text.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear,),
-                          onPressed: () => resetSearch(),
-                        )
-                      : null,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16.0),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.all(16.0),
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      searchItems(value);
-                    });
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: <Widget>[
+                IconButton(
+                  icon: const Icon(Icons.face),
+                  color: Theme.of(context).colorScheme.primary,
+                  onPressed: () {
+                    Navigator.of(context)
+                      .push(MaterialPageRoute(
+                        builder: (context) => const BlankPage(),
+                      ));
                   },
                 ),
-              ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: TextField(
+                      controller: searchController,
+                      autofocus: true,
+                      decoration: InputDecoration(
+                        hintText: 'Search by a tag',
+                        suffixIcon: searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear,),
+                              onPressed: () => resetSearch(),
+                            )
+                          : null,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.all(16.0),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          searchItems(value);
+                        });
+                      },
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  color: Theme.of(context).colorScheme.primary,
+                  onPressed: () {
+                    addEditItem(0);
+                  },
+                ),
+              ],
             ),
-            IconButton(
-              icon: const Icon(Icons.add),
-              color: Theme.of(context).colorScheme.primary,
-              onPressed: () {
-                addEditItem(0);
-              },
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -136,7 +145,6 @@ class HomePageState extends State<HomePage> {
         return const Center(child: Text("Add Items"));
       } else {
         return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Center(
               child: Text(
@@ -161,23 +169,21 @@ class HomePageState extends State<HomePage> {
         );
       }
     } else {
-      return SingleChildScrollView(
-        child: Center(
-          child: Wrap(
-            spacing: 10.0,
-            runSpacing: 10,
-            children: items.map((item) {
-              return SizedBox(
-                    width: 150,
-                    height: 150,
-                    child: Card(
-                      child: Center(
-                        child: Image.memory(item.image),
-                      ),
+      return Center(
+        child: Wrap(
+          spacing: 10.0,
+          runSpacing: 10,
+          children: items.map((item) {
+            return SizedBox(
+                  width: 150,
+                  height: 150,
+                  child: Card(
+                    child: Center(
+                      child: Image.memory(item.image),
                     ),
-                  );
-            }).toList(),
-          ),
+                  ),
+                );
+          }).toList(),
         ),
       );
     }
