@@ -1,11 +1,9 @@
-
-
 import 'dart:typed_data';
 
+import 'package:forgetit/globals.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -23,7 +21,8 @@ class DatabaseHelper {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-    return await openDatabase(path, version: 1, onCreate: _onCreate,onOpen: _onOpen);
+    return await openDatabase(path,
+        version: 1, onCreate: _onCreate, onOpen: _onOpen);
   }
 
   Future _onOpen(Database db) async {
@@ -92,21 +91,30 @@ class DatabaseHelper {
     ''');
     // Add more tables as needed
     await _seedDatabase(db);
-      
   }
 
   Future<void> _seedDatabase(Database db) async {
-    await db.insert("profile",{"id":null,"title":"Home","image":Uint8List(0)});
-    await db.insert("profile",{"id":null,"title":"Office","image":Uint8List(0)});
+    int at = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
+    Uint8List homeImage = getBlankImage(512);
+    await db
+        .insert("profile", {"id": 1, "title": "Home", "image": homeImage,"at":at});
+        Uint8List officeImage = getBlankImage(512);
+    await db
+        .insert("profile", {"id": 2, "title": "Office", "image": officeImage,"at":at});
   }
 
   Future<int> insert(String tableName, Map<String, dynamic> row) async {
     final db = await instance.database;
     row['at'] = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
-    return await db.insert(tableName, row, conflictAlgorithm: ConflictAlgorithm.replace,);
+    return await db.insert(
+      tableName,
+      row,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
-  Future<int> update(String tableName, Map<String, dynamic> row, dynamic id) async {
+  Future<int> update(
+      String tableName, Map<String, dynamic> row, dynamic id) async {
     final db = await instance.database;
     row['at'] = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
     return await db.update(tableName, row, where: 'id = ?', whereArgs: [id]);
@@ -117,9 +125,11 @@ class DatabaseHelper {
     return await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<List<Map<String,dynamic>>> queryOne(String tableName, dynamic id) async {
+  Future<List<Map<String, dynamic>>> queryOne(
+      String tableName, dynamic id) async {
     final db = await instance.database;
-    return await db.query(tableName, where: "id = ?", whereArgs: [id], limit: 1);
+    return await db.query(tableName,
+        where: "id = ?", whereArgs: [id], limit: 1);
   }
 
   Future<List<Map<String, dynamic>>> queryAll(String tableName) async {

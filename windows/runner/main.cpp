@@ -25,7 +25,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   project.set_dart_entrypoint_arguments(std::move(command_line_arguments));
 
   FlutterWindow window(project);
-  Win32Window::Point origin(1100, 30);
+  Win32Window::Point origin(1300, 30);
   Win32Window::Size size(350, 720);
   if (!window.Create(L"forgetit", origin, size)) {
     return EXIT_FAILURE;

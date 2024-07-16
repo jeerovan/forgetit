@@ -12,9 +12,9 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 bool mobile = Platform.isAndroid;
 
 void main() async {
-    WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
-  if (!mobile){
+  if (!mobile) {
     // Initialize sqflite for FFI (non-mobile platforms)
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
@@ -23,7 +23,9 @@ void main() async {
   // initialize the db
   DatabaseHelper dbHelper = DatabaseHelper.instance;
   List<Map<String, dynamic>> keyValuePairs = await dbHelper.queryAll('setting');
-  ModelSetting.appJson = { for (var pair in keyValuePairs) pair['id'] : jsonDecode(pair['value']) };
+  ModelSetting.appJson = {
+    for (var pair in keyValuePairs) pair['id']: jsonDecode(pair['value'])
+  };
 
   runApp(const MainApp());
 }

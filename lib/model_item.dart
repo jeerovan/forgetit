@@ -58,11 +58,13 @@ class ModelItem {
     List<Map<String,dynamic>> rows = await db.rawQuery(sql,[profileId,'%$tag%']);
     return await Future.wait(rows.map((map) => fromMap(map)));
   }
-  static Future<ModelItem?> getLastAdded() async{
+  static Future<ModelItem?> getLastAdded(int profileId) async{
     final dbHelper = DatabaseHelper.instance;
     final db = await dbHelper.database;
     List<Map<String,dynamic>> rows = await db.query(
       "item",
+      where: "profile_id == ?",
+      whereArgs: [profileId],
       orderBy:'id DESC',
       limit: 1,
     );

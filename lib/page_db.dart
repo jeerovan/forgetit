@@ -27,8 +27,8 @@ class _DatabasePageState extends State<DatabasePage> {
   Future<void> _initDatabase() async {
     _database = await dbHelper.database;
 
-    List<Map<String, dynamic>> tables =
-        await _database!.rawQuery("SELECT name FROM sqlite_master WHERE type='table';");
+    List<Map<String, dynamic>> tables = await _database!
+        .rawQuery("SELECT name FROM sqlite_master WHERE type='table';");
     _tables = tables.map((table) => table['name'].toString()).toList();
 
     setState(() {});
@@ -36,7 +36,8 @@ class _DatabasePageState extends State<DatabasePage> {
 
   Future<void> _loadTableData(String tableName) async {
     List<Map<String, dynamic>> tableData = await _database!.query(tableName);
-    List<Map<String, dynamic>> result = await _database!.rawQuery('PRAGMA table_info($tableName)');
+    List<Map<String, dynamic>> result =
+        await _database!.rawQuery('PRAGMA table_info($tableName)');
     _columns = result.map((column) => column['name'] as String).toList();
     setState(() {
       _selectedTable = tableName;
@@ -47,7 +48,9 @@ class _DatabasePageState extends State<DatabasePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Back'),),
+      appBar: AppBar(
+        title: const Text('Back'),
+      ),
       body: _database == null
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -55,18 +58,20 @@ class _DatabasePageState extends State<DatabasePage> {
               children: [
                 Expanded(
                   child: _selectedTable == null
-                      ? const Center(child: Text('Select a table to view its data'))
+                      ? const Center(
+                          child: Text('Select a table to view its data'))
                       : SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: DataTable(
                               columns: _columns.map((String columnName) {
-                                      return DataColumn(
-                                        label: Text(columnName),
-                                      );
-                                    }).toList(),
-                              rows: _tableData.map((Map<String, dynamic> rowData) {
+                                return DataColumn(
+                                  label: Text(columnName),
+                                );
+                              }).toList(),
+                              rows: _tableData
+                                  .map((Map<String, dynamic> rowData) {
                                 return DataRow(
                                   cells: rowData.keys.map((String columnName) {
                                     return DataCell(
@@ -77,7 +82,7 @@ class _DatabasePageState extends State<DatabasePage> {
                               }).toList(),
                             ),
                           ),
-                      ),
+                        ),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),

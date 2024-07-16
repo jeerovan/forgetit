@@ -33,6 +33,14 @@ class ModelProfile {
       image: map.containsKey('image') ? map['image'] : Uint8List(0),
     );
   }
+  static Future<List<ModelProfile>> all() async {
+    final dbHelper = DatabaseHelper.instance;
+    final db = await dbHelper.database;
+    List<Map<String,dynamic>> rows = await db.query(
+      "profile",
+    );
+    return await Future.wait(rows.map((map) => fromMap(map)));
+  }
   static Future<ModelProfile?> get(int id) async{
     final dbHelper = DatabaseHelper.instance;
     List<Map<String,dynamic>> list = await dbHelper.queryOne("profile", id);
