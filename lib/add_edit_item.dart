@@ -167,7 +167,7 @@ class AddEditItemState extends State<AddEditItem> {
   }
 
   void removeTag(ModelTag tag) async {
-    if (item.id != null) {
+    if (item.id != null && tag.id != null) {
       await ModelItemTag.removeForItemIdTagId(item.id!, tag.id!);
     }
     setState(() {
@@ -250,7 +250,9 @@ class AddEditItemState extends State<AddEditItem> {
     super.initState();
     initData();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _getPicture(mobile ? ImageSource.camera : ImageSource.gallery);
+      if(widget.itemId == 0){
+        _getPicture(mobile ? ImageSource.camera : ImageSource.gallery);
+      }
     });
   }
 

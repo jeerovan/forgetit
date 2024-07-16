@@ -7,8 +7,6 @@ import 'package:image_picker/image_picker.dart';
 
 import 'globals.dart';
 
-bool mobile = Platform.isAndroid;
-
 class AddEditProfile extends StatefulWidget {
   final int profileId;
   final Function() onUpdate;
@@ -88,11 +86,7 @@ class AddEditProfileState extends State<AddEditProfile> {
               children: [
                 GestureDetector(
                   onTap: () async {
-                    if (mobile) {
-                      await _getPicture(ImageSource.camera);
-                    } else {
-                      await _getPicture(ImageSource.gallery);
-                    }
+                    await _getPicture(ImageSource.gallery);
                   },
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
