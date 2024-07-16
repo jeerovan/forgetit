@@ -26,32 +26,24 @@ class HomePageState extends State<HomePage> {
   List<ModelItem> items = [];
   ModelProfile profile = ModelProfile.init();
 
-  void init() async {
+  void init() {
     loadProfile(profileId);
-    loadLastAdded();
-    setState(() {
-    });
   }
-
-  void loadLastAdded() async {
+  
+  void loadProfile(int selectedProfileId) async {
+    profileId = selectedProfileId;
+    await ModelSetting.update("profile", selectedProfileId);
+    ModelProfile? existingProfile = await ModelProfile.get(selectedProfileId);
+    if (existingProfile != null){
+      profile = existingProfile;
+    }
     ModelItem? item = await ModelItem.getLastAdded(profileId);
     if (item != null) {
       lastAdded = item;
     } else {
       lastAdded = ModelItem.init();
     }
-  }
-  
-  void loadProfile(int selectedProfileId) async {
-    ModelSetting.update("profile", profileId);
-    profileId = selectedProfileId;
-    ModelProfile? existingProfile = await ModelProfile.get(selectedProfileId);
-    if (existingProfile != null){
-      profile = existingProfile;
-    }
-    loadLastAdded();
     setState(() {
-      
     });
   }
 
@@ -80,9 +72,8 @@ class HomePageState extends State<HomePage> {
   void selectProfile(){
     Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => ProfilePage(
-        onSelect : (profileId) {
-          loadProfile(profileId);
-          setState(() {});
+        onSelect : (id) {
+          loadProfile(id);
         }
       )
     ));
@@ -96,6 +87,7 @@ class HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    searchController.dispose();
     super.dispose();
   }
 
@@ -130,8 +122,8 @@ class HomePageState extends State<HomePage> {
                   icon: ClipOval(
                     child: Image.memory(
                       profile.id != null && profile.image.isNotEmpty ? profile.image : getBlankImage(512),
-                      width: 30,
-                      height: 30,
+                      width: 45,
+                      height: 45,
                       fit: BoxFit.cover,
                     ),
                   ),

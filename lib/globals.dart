@@ -335,13 +335,13 @@ Future<Uint8List> getResizedCroppedImage(Uint8List bytes,int maxSize) async {
     int srcHeight = src.height;
     if (srcWidth < srcHeight) {
       pimg.Image resized = pimg.copyResize(src, width: maxSize);
-      int offsetY = (src.height - maxSize) ~/ 2;
+      int offsetY = (resized.height - maxSize) ~/ 2;
       pimg.Image destImage = pimg.copyCrop(resized,
           x: 0, y: offsetY, width: maxSize, height: maxSize);
       return Uint8List.fromList(pimg.encodePng(destImage));
     } else {
-      pimg.Image resized = pimg.copyResize(src, width: 1024);
-      int offsetX = (src.width - maxSize) ~/ 2;
+      pimg.Image resized = pimg.copyResize(src, height: maxSize);
+      int offsetX = (resized.width - maxSize) ~/ 2;
       pimg.Image destImage = pimg.copyCrop(resized,
           x: offsetX, y: 0, width: maxSize, height: maxSize);
       return Uint8List.fromList(pimg.encodePng(destImage));

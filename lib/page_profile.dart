@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forgetit/add_edit_profile.dart';
 import 'package:forgetit/globals.dart';
 
 import 'model_profile.dart';
@@ -12,7 +13,6 @@ class ProfilePage extends StatefulWidget {
 }
 
 class ProfilePageState extends State<ProfilePage> {
-  List<ModelProfile> profiles = [];
 
   @override
   void initState() {
@@ -22,6 +22,18 @@ class ProfilePageState extends State<ProfilePage> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void addEditProfile(int profileId){
+    Navigator.of(context)
+    .push(MaterialPageRoute(
+      builder: (context) => AddEditProfile(
+        profileId: profileId,
+        onUpdate: (){setState(() {
+          
+        });},
+        ),
+    ));
   }
 
   @override
@@ -57,6 +69,7 @@ class ProfilePageState extends State<ProfilePage> {
                                     Navigator.of(context).pop();
                                   },
                                   onLongPress: () {
+                                    addEditProfile(profile.id!);
                                   },
                                 child: ClipOval(
                                   child: Image.memory(
@@ -77,17 +90,17 @@ class ProfilePageState extends State<ProfilePage> {
                     const SizedBox(height: 16,),
                     Center(
                       child: SizedBox(
-                        width: 100,
-                        height: 100,
+                        width: 50,
+                        height: 50,
                         child: ElevatedButton(
                           onPressed: () {
-                            // Handle button press
+                            addEditProfile(0);
                           },
                           style: ElevatedButton.styleFrom(
                             shape: const CircleBorder(),
-                            padding: const EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(10),
                           ),
-                          child: const Icon(Icons.add, size: 40),
+                          child: const Icon(Icons.add, size: 30),
                         ),
                       ),
                     ),

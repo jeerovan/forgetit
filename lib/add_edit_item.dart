@@ -66,9 +66,9 @@ class AddEditItemState extends State<AddEditItem> {
     }
   }
 
-  Future<void> _takePicture() async {
+  Future<void> _getPicture(ImageSource source) async {
     final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.camera);
+        await ImagePicker().pickImage(source: source);
     setState(() {
       processing = true;
     });
@@ -80,11 +80,6 @@ class AddEditItemState extends State<AddEditItem> {
     setState(() {
       processing = false;
     });
-  }
-
-  void _setImage() {
-    image = getBlankImage(512);
-    setState(() {});
   }
 
   void updateAvailableTags(String query) async {
@@ -109,7 +104,7 @@ class AddEditItemState extends State<AddEditItem> {
         tagTextFieldKey.currentContext?.findRenderObject() as RenderBox;
     final size = renderBox.size;
     final offset = renderBox.localToGlobal(Offset.zero);
-    double overlayHeight = 200;
+    double overlayHeight = 100;
     entry = OverlayEntry(
       builder: (context) => Positioned(
         left: offset.dx,
@@ -199,6 +194,7 @@ class AddEditItemState extends State<AddEditItem> {
       if (itemTitle.isEmpty || image == null) {
         showAlertMessage(
             context, "Alert", "Please add image and some helpful text");
+        return;
       } else {
         int? itemId = item.id;
         if (itemId == null) {
@@ -288,9 +284,9 @@ class AddEditItemState extends State<AddEditItem> {
                   GestureDetector(
                     onTap: () async {
                       if (mobile) {
-                        await _takePicture();
+                        await _getPicture(ImageSource.camera);
                       } else {
-                        _setImage();
+                        await _getPicture(ImageSource.gallery);
                       }
                     },
                     child: ClipRRect(
