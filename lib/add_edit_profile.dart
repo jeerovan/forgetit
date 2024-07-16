@@ -107,7 +107,7 @@ class AddEditProfileState extends State<AddEditProfile> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: TextField(
                     controller: profileController,
                     autofocus: true,

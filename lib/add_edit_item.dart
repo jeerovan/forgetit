@@ -249,6 +249,9 @@ class AddEditItemState extends State<AddEditItem> {
   void initState() {
     super.initState();
     initData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _getPicture(mobile ? ImageSource.camera : ImageSource.gallery);
+    });
   }
 
   @override

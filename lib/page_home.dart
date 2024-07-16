@@ -8,7 +8,7 @@ import 'package:forgetit/page_profile.dart';
 import 'globals.dart';
 import 'page_db.dart';
 
-bool debug = true;
+bool debug = false;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
