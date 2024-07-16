@@ -21,6 +21,7 @@ class HomePageState extends State<HomePage> {
   int profileId = ModelSetting.getForKey("profile", 1);
 
   final TextEditingController searchController = TextEditingController();
+  final FocusNode searchFocusNode = FocusNode();
 
   ModelItem lastAdded = ModelItem.init();
   List<ModelItem> items = [];
@@ -83,11 +84,15 @@ class HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     init();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).requestFocus(searchFocusNode);
+    });
   }
 
   @override
   void dispose() {
     searchController.dispose();
+    searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -137,7 +142,7 @@ class HomePageState extends State<HomePage> {
                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
                     child: TextField(
                       controller: searchController,
-                      autofocus: true,
+                      focusNode: searchFocusNode,
                       decoration: InputDecoration(
                         hintText: 'Search by a tag',
                         suffixIcon: searchController.text.isNotEmpty
@@ -215,12 +220,15 @@ class HomePageState extends State<HomePage> {
             spacing: 10.0,
             runSpacing: 15.0,
             children: items.map((item) {
-              return ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: SizedBox(
-                  width: 150,
-                  height: 150,
-                  child: Image.memory(item.image),
+              return GestureDetector(
+                onTap: () => addEditItem(item.id!),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: SizedBox(
+                    width: 150,
+                    height: 150,
+                    child: Image.memory(item.image),
+                  ),
                 ),
               );
             }).toList(),

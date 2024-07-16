@@ -104,7 +104,7 @@ class AddEditItemState extends State<AddEditItem> {
         tagTextFieldKey.currentContext?.findRenderObject() as RenderBox;
     final size = renderBox.size;
     final offset = renderBox.localToGlobal(Offset.zero);
-    double overlayHeight = 100;
+    double overlayHeight = 150;
     entry = OverlayEntry(
       builder: (context) => Positioned(
         left: offset.dx,
