@@ -1,6 +1,5 @@
-import 'dart:typed_data';
 
-import 'package:forgetit/globals.dart';
+import 'package:flutter/services.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -93,14 +92,24 @@ class DatabaseHelper {
     await _seedDatabase(db);
   }
 
+  Future<Uint8List> loadImageAsUint8List(String assetPath) async {
+    ByteData data = await rootBundle.load(assetPath);
+    return data.buffer.asUint8List();
+  }
+
   Future<void> _seedDatabase(Database db) async {
     int at = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
-    Uint8List homeImage = getBlankImage(512);
-    await db
-        .insert("profile", {"id": 1, "title": "Home", "image": homeImage,"at":at});
-        Uint8List officeImage = getBlankImage(512);
-    await db
-        .insert("profile", {"id": 2, "title": "Office", "image": officeImage,"at":at});
+    Uint8List home = await loadImageAsUint8List('assets/Home.png');
+    await db.insert("profile", {"id": 1, "title": "Home", "image": home,"at":at});
+
+    Uint8List office = await loadImageAsUint8List('assets/Office.png');
+    await db.insert("profile", {"id": 2, "title": "Office", "image": office,"at":at});
+    
+    Uint8List kitchen = await loadImageAsUint8List('assets/Kitchen.png');
+    await db.insert("profile", {"id": 3, "title": "Kitchen", "image": kitchen,"at":at});
+    
+    Uint8List bedroom = await loadImageAsUint8List('assets/Bedroom.png');
+    await db.insert("profile", {"id": 4, "title": "Bedroom", "image": bedroom,"at":at});
   }
 
   Future<int> insert(String tableName, Map<String, dynamic> row) async {
