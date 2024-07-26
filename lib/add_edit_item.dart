@@ -196,7 +196,7 @@ class AddEditItemState extends State<AddEditItem> {
         return;
       } else {
         if(itemTagController.text.isNotEmpty){
-          List<String> tagTitles = itemTagController.text.split(" ");
+          List<String> tagTitles = itemTagController.text.trim().split(" ");
           for (String tagTitle in tagTitles){
             checkAddTag(ModelTag(title: tagTitle));
           }
