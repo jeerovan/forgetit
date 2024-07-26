@@ -52,8 +52,6 @@ class AddEditItemState extends State<AddEditItem> {
         } else {
           hideOverlay();
         }
-      } else if (availableTags.isEmpty) {
-        resetSearch();
       }
     });
     ModelItem? existingItem = await ModelItem.get(widget.itemId);
@@ -152,6 +150,7 @@ class AddEditItemState extends State<AddEditItem> {
     itemChanged = true;
     setState(() {
       checkAddTag(tag);
+      resetSearch();
     });
   }
 
@@ -196,6 +195,12 @@ class AddEditItemState extends State<AddEditItem> {
             context, "Alert", "Please add image and some helpful text");
         return;
       } else {
+        if(itemTagController.text.isNotEmpty){
+          List<String> tagTitles = itemTagController.text.split(" ");
+          for (String tagTitle in tagTitles){
+            checkAddTag(ModelTag(title: tagTitle));
+          }
+        }
         int? itemId = item.id;
         if (itemId == null) {
           // add new item
@@ -210,7 +215,7 @@ class AddEditItemState extends State<AddEditItem> {
         }
         for (ModelTag tag in tags) {
           int? tagId = tag.id;
-          tagId ??= await tag.insert();
+          tagId ??= await tag.checkInsert();
           tag.id = tagId;
           await ModelItemTag.checkAddItemTag(
             itemId,
@@ -326,6 +331,9 @@ class AddEditItemState extends State<AddEditItem> {
                           onTap: () => removeTag(tag),
                           child: Chip(
                             label: Text(tag.title),
+                            deleteIcon: const Icon(Icons.cancel),
+                            deleteIconColor: Colors.red,
+                            onDeleted: () => removeTag(tag),
                           ),
                         );
                       }).toList(),
@@ -354,10 +362,10 @@ class AddEditItemState extends State<AddEditItem> {
                       controller: itemTagController,
                       focusNode: tagFocusNode,
                       decoration: InputDecoration(
-                        hintText: 'Add a tag',
+                        hintText: 'Add tags. Type and tap +',
                         suffixIcon: IconButton(
                           icon: const Icon(
-                            Icons.publish,
+                            Icons.add,
                           ),
                           color: Theme.of(context).colorScheme.primary,
                           onPressed: () {

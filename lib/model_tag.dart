@@ -42,6 +42,19 @@ class ModelTag {
     }
     return null;
   }
+  Future<int> checkInsert() async {
+    final dbHelper = DatabaseHelper.instance;
+    final db = await dbHelper.database;
+    List<Map<String,dynamic>> rows = await db.query(
+      'tag',
+      where: 'title == ?',
+      whereArgs: ['%$title%']);
+    if(rows.isEmpty){
+      return await dbHelper.insert("tag", toMap());
+    } else {
+      return rows.first['id'];
+    }
+  }
   Future<int> insert() async{
     final dbHelper = DatabaseHelper.instance;
     return await dbHelper.insert("tag", toMap());

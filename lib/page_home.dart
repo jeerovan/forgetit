@@ -7,6 +7,7 @@ import 'package:forgetit/page_profile.dart';
 
 import 'globals.dart';
 import 'page_db.dart';
+import 'page_settings.dart';
 
 bool debug = false;
 
@@ -102,6 +103,14 @@ class HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text("Forget It"),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.settings), 
+            onPressed: () {
+              Navigator.of(context)
+                .push(MaterialPageRoute(
+                  builder: (context) => const SettingsPage(),
+                ));
+          }) ,
           if (debug)
             IconButton(
                 icon: const Icon(Icons.reorder),
@@ -109,15 +118,13 @@ class HomePageState extends State<HomePage> {
                   Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => const DatabasePage(),
                   ));
-                })
+                }),
         ],
       ),
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              child: itemsView(),
-            ),
+            child: itemsView(),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -184,34 +191,48 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget itemsView() {
-    if (items.isEmpty) {
+    if (searchController.text.isEmpty){
       if (lastAdded.id == null) {
-        return  Text("Add Items",style: Theme.of(context).textTheme.titleMedium,);
+        return  Center(child: Text("Tap on + to add items",style: Theme.of(context).textTheme.titleMedium,));
       } else {
-        return Column(
-          children: [
-            Center(
-              child: Text(
-                "Last Added",
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-            ),
-            GestureDetector(
-              onTap: () => addEditItem(lastAdded.id!),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(25),
-                child: SizedBox(
-                  width: 200,
-                  height: 200,
-                  child: lastAdded.image.isEmpty
-                      ? const Text("Image not available")
-                      : Image.memory(lastAdded.image,fit: BoxFit.cover,),
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              Center(
+                child: Text(
+                  "Last Added",
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 8,),
+              GestureDetector(
+                onTap: () => addEditItem(lastAdded.id!),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(25),
+                  child: SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: lastAdded.image.isEmpty
+                        ? const Text("Image not available")
+                        : Image.memory(lastAdded.image,fit: BoxFit.cover,),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16,),
+              ClipRRect(
+                  borderRadius: BorderRadius.circular(25),
+                  child: const SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: Center(child: Text("Tap on image above to edit it or + below to add items")),
+                  ),
+                ),
+            ],
+          ),
         );
       }
+    } else if (items.isEmpty) {
+      return  Center(child: Text("No items found",style: Theme.of(context).textTheme.titleMedium,));
     } else {
       return Padding(
         padding: const EdgeInsets.all(8.0),
