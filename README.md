@@ -34,7 +34,7 @@
 
 ## Features
 
-* **Search By Tags:** Search easily by tags.
+* **Search with Tags:** Search easily with tags.
 * **Multiple Profiles:** Categorize items by profiles
 * **Quick Tag Selection:** After you have created a tag for an item, it will be shown as a selection for other items.
 * **Quick Edit:** You can quickly edit the last item added from the home page.
@@ -45,9 +45,7 @@
 
 **Play Store (Android)**
 
-The app is currently in closed testing so please join the following Google group to download the app: [Click Here](http://groups.google.com/g/abona)
-
-Play Store Url: [Click Here](https://play.google.com/store/apps/details?id=com.forget.it)
+Play Store Url: [https://play.google.com/store/apps/details?id=com.forget.it](https://play.google.com/store/apps/details?id=com.forget.it)
 
 ## Build it yourself
 
@@ -82,6 +80,6 @@ Play Store Url: [Click Here](https://play.google.com/store/apps/details?id=com.f
 ## Upcoming Features
 
 - Show all items for a profile
+- Move an item from one profile to another
 - Add Google Sign-In
 - Sync database with Google Drive
-- Move an item from one profile to another
