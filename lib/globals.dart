@@ -328,7 +328,8 @@ Widget rotatedWidget(Widget widget) {
   );
 }
 
-Future<Uint8List> getResizedCroppedImage(Uint8List bytes,int maxSize) async {
+Uint8List getResizedCroppedImage(Uint8List bytes) {
+  int maxSize = 512;
   pimg.Image? src = pimg.decodeImage(bytes);
   if (src != null) {
     int srcWidth = src.width;

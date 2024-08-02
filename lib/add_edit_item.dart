@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:forgetit/globals.dart';
 import 'package:forgetit/model_item.dart';
@@ -8,6 +8,7 @@ import 'package:forgetit/model_setting.dart';
 import 'package:forgetit/model_tag.dart';
 import 'package:image_picker/image_picker.dart';
 import 'model_item_tag.dart';
+
 
 bool mobile = Platform.isAndroid;
 
@@ -65,14 +66,14 @@ class AddEditItemState extends State<AddEditItem> {
   }
 
   Future<void> _getPicture(ImageSource source) async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: source);
     setState(() {
       processing = true;
     });
+    final pickedFile =
+        await ImagePicker().pickImage(source: source);
     if (pickedFile != null) {
       Uint8List bytes = await File(pickedFile.path).readAsBytes();
-      image = await getResizedCroppedImage(bytes,512);
+      image = await compute(getResizedCroppedImage, bytes);
       itemChanged = true;
     }
     setState(() {
@@ -233,10 +234,10 @@ class AddEditItemState extends State<AddEditItem> {
   }
 
   Widget getBoxContent() {
-    if (image != null) {
-      return Image.memory(image!);
-    } else if (processing) {
+    if (processing) {
       return  const Card(child: Center(child: CircularProgressIndicator()));
+    } else if (image != null) {
+      return Image.memory(image!);
     } else {
       return const Card(
         child: Center(

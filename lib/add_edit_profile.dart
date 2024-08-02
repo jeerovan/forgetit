@@ -1,6 +1,5 @@
 import 'dart:io';
-import 'dart:typed_data';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:forgetit/model_profile.dart';
 import 'package:image_picker/image_picker.dart';
@@ -42,7 +41,7 @@ class AddEditProfileState extends State<AddEditProfile> {
     });
     if (pickedFile != null) {
       Uint8List bytes = await File(pickedFile.path).readAsBytes();
-      profile.image = await getResizedCroppedImage(bytes,512);
+      profile.image = await compute(getResizedCroppedImage, bytes);
       itemChanged = true;
     }
     setState(() {
@@ -60,6 +59,24 @@ class AddEditProfileState extends State<AddEditProfile> {
       widget.onUpdate();
     }
     if(mounted)Navigator.of(context).pop();
+  }
+
+  Widget getBoxContent() {
+    if (processing) {
+      return  const Card(child: Center(child: CircularProgressIndicator()));
+    } else if (profile.image.isNotEmpty) {
+      return Image.memory(profile.image);
+    } else {
+      return const Card(
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(8.0),
+            child:
+                Text("Tap to set profile image"),
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -93,10 +110,7 @@ class AddEditProfileState extends State<AddEditProfile> {
                     child: SizedBox(
                       width: 150,
                       height: 150,
-                      child: Center(child: 
-                        profile.image.isEmpty ? 
-                        const Text("Tap to set image")
-                        : Image.memory(profile.image)),
+                      child: Center(child: getBoxContent()),
                     ),
                   ),
                 ),

@@ -151,7 +151,7 @@ class HomePageState extends State<HomePage> {
                       controller: searchController,
                       focusNode: searchFocusNode,
                       decoration: InputDecoration(
-                        hintText: 'Search by a tag',
+                        hintText: 'Search with a tag',
                         suffixIcon: searchController.text.isNotEmpty
                             ? IconButton(
                                 icon: const Icon(
