@@ -44,6 +44,17 @@ class ModelItem {
       image:map.containsKey('image') ? map['image'] : "",
     );
   }
+  static Future<List<ModelItem>> getAll(int profileId) async {
+    final dbHelper = DatabaseHelper.instance;
+    final db = await dbHelper.database;
+    List<Map<String,dynamic>> rows = await db.query(
+      "item",
+      where: "profile_id == ?",
+      whereArgs: [profileId],
+      orderBy:'id DESC',
+    );
+    return await Future.wait(rows.map((map) => fromMap(map)));
+  }
   static Future<List<ModelItem>> getForTag(String tag,int profileId) async {
     final dbHelper = DatabaseHelper.instance;
     final db = await dbHelper.database;
@@ -74,6 +85,7 @@ class ModelItem {
     }
     return null;
   }
+  
   static Future<ModelItem?> get(int id) async{
     final dbHelper = DatabaseHelper.instance;
     List<Map<String,dynamic>> list = await dbHelper.queryOne("item", id);

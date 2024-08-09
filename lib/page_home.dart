@@ -45,6 +45,7 @@ class HomePageState extends State<HomePage> {
     } else {
       lastAdded = ModelItem.init();
     }
+    items = await getItems();
     setState(() {
     });
   }
@@ -57,17 +58,25 @@ class HomePageState extends State<HomePage> {
         );
   }
 
-  void resetSearch() {
-    items = [];
+  void resetSearch() async {
+    items = await getItems();
     searchController.clear();
     setState(() {});
+  }
+
+  Future<List<ModelItem>> getItems() async {
+    if (ModelSetting.getForKey("show_all", false)){
+      return await ModelItem.getAll(profileId);
+    } else {
+      return [];
+    }
   }
 
   void searchItems(String query) async {
     if (query.length > 1) {
       items = await ModelItem.getForTag(query, profileId);
     } else {
-      items = [];
+      items = await getItems();
     }
   }
 
@@ -109,7 +118,8 @@ class HomePageState extends State<HomePage> {
               Navigator.of(context)
                 .push(MaterialPageRoute(
                   builder: (context) => const SettingsPage(),
-                ));
+                )).then((_) => init() // refresh recently added entries
+                );
           }) ,
           if (debug)
             IconButton(
@@ -124,7 +134,7 @@ class HomePageState extends State<HomePage> {
       body: Column(
         children: [
           Expanded(
-            child: itemsView(),
+            child: pageView(),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -190,51 +200,65 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  Widget itemsView() {
+  Widget pageView() {
+    bool showAll = ModelSetting.getForKey("show_all", false);
     if (searchController.text.isEmpty){
       if (lastAdded.id == null) {
         return  Center(child: Text("Tap on + to add items",style: Theme.of(context).textTheme.titleMedium,));
+      } else if (items.length == 1){
+        return singleItemView();
+      } else if(showAll) {
+        return itemsView();
       } else {
-        return SingleChildScrollView(
-          child: Column(
-            children: [
-              Center(
-                child: Text(
-                  "Last Added",
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-              ),
-              const SizedBox(height: 8,),
-              GestureDetector(
-                onTap: () => addEditItem(lastAdded.id!),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: SizedBox(
-                    width: 200,
-                    height: 200,
-                    child: lastAdded.image.isEmpty
-                        ? const Text("Image not available")
-                        : Image.memory(lastAdded.image,fit: BoxFit.cover,),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16,),
-              ClipRRect(
-                  borderRadius: BorderRadius.circular(25),
-                  child: const SizedBox(
-                    width: 200,
-                    height: 200,
-                    child: Center(child: Text("Tap on image above to edit it or + below to add items")),
-                  ),
-                ),
-            ],
-          ),
-        );
+        return singleItemView();
       }
     } else if (items.isEmpty) {
       return  Center(child: Text("No items found",style: Theme.of(context).textTheme.titleMedium,));
     } else {
-      return Padding(
+      return itemsView();
+    }
+  }
+
+  Widget singleItemView(){
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Center(
+            child: Text(
+              "Last Added",
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ),
+          const SizedBox(height: 8,),
+          GestureDetector(
+            onTap: () => addEditItem(lastAdded.id!),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: SizedBox(
+                width: 200,
+                height: 200,
+                child: lastAdded.image.isEmpty
+                    ? const Text("Image not available")
+                    : Image.memory(lastAdded.image,fit: BoxFit.cover,),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16,),
+          ClipRRect(
+              borderRadius: BorderRadius.circular(25),
+              child: const SizedBox(
+                width: 200,
+                height: 200,
+                child: Center(child: Text("Tap on image above to edit it or + below to add items")),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget itemsView() {
+    return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Center(
           child: Wrap(
@@ -256,6 +280,5 @@ class HomePageState extends State<HomePage> {
           ),
         ),
       );
-    }
   }
 }
