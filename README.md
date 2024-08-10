@@ -79,7 +79,6 @@ Play Store Url: [https://play.google.com/store/apps/details?id=com.forget.it](ht
 
 ## Upcoming Features
 
-- Show all items for a profile
 - Move an item from one profile to another
 - Add Google Sign-In
 - Sync database with Google Drive
