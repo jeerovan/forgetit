@@ -179,7 +179,7 @@ class HomePageState extends State<HomePage> {
                       ),
                       onChanged: (value) {
                         setState(() {
-                          searchItems(value);
+                          searchItems(value.trim());
                         });
                       },
                     ),
