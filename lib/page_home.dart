@@ -258,9 +258,9 @@ class HomePageState extends State<HomePage> {
   }
 
   Widget itemsView() {
-    return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Center(
+    return SingleChildScrollView(
+      child: Padding(
+          padding: const EdgeInsets.all(8.0),
           child: Wrap(
             spacing: 10.0,
             runSpacing: 15.0,
@@ -279,6 +279,6 @@ class HomePageState extends State<HomePage> {
             }).toList(),
           ),
         ),
-      );
+    );
   }
 }
