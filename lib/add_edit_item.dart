@@ -282,7 +282,6 @@ class AddEditItemState extends State<AddEditItem> {
                 onPressed: deleteItem,
                 icon: const Icon(
                   Icons.delete,
-                  color: Colors.red,
                 ))
         ],
       ),
@@ -333,7 +332,6 @@ class AddEditItemState extends State<AddEditItem> {
                           child: Chip(
                             label: Text(tag.title),
                             deleteIcon: const Icon(Icons.cancel),
-                            deleteIconColor: Colors.red,
                             onDeleted: () => removeTag(tag),
                           ),
                         );
@@ -349,7 +347,6 @@ class AddEditItemState extends State<AddEditItem> {
             child: Row(
               children: <Widget>[
                 IconButton(
-                  color: Theme.of(context).colorScheme.primary,
                   icon: const Icon(Icons.check),
                   onPressed: () {
                     saveItem();
@@ -368,7 +365,6 @@ class AddEditItemState extends State<AddEditItem> {
                           icon: const Icon(
                             Icons.add,
                           ),
-                          color: Theme.of(context).colorScheme.primary,
                           onPressed: () {
                             addNewTag();
                           },
@@ -376,8 +372,6 @@ class AddEditItemState extends State<AddEditItem> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(16.0),
                         ),
-                        filled: true,
-                        fillColor: Colors.white,
                         contentPadding: const EdgeInsets.all(16.0),
                       ),
                       onChanged: (value) {

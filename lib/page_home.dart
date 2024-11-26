@@ -12,7 +12,13 @@ import 'page_settings.dart';
 bool debug = false;
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final bool isDarkMode;
+  final VoidCallback onThemeToggle;
+  const HomePage({
+    super.key,
+      required this.isDarkMode,
+      required this.onThemeToggle,
+    });
 
   @override
   HomePageState createState() => HomePageState();
@@ -117,7 +123,10 @@ class HomePageState extends State<HomePage> {
             onPressed: () {
               Navigator.of(context)
                 .push(MaterialPageRoute(
-                  builder: (context) => const SettingsPage(),
+                  builder: (context) => SettingsPage(
+                      isDarkMode: widget.isDarkMode,
+                      onThemeToggle: widget.onThemeToggle,
+                  ),
                 )).then((_) => init() // refresh recently added entries
                 );
           }) ,
@@ -136,64 +145,60 @@ class HomePageState extends State<HomePage> {
           Expanded(
             child: pageView(),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: <Widget>[
-                IconButton(
-                  icon: ClipOval(
-                    child: Image.memory(
-                      profile.id != null && profile.image.isNotEmpty ? profile.image : getBlankImage(512),
-                      width: 45,
-                      height: 45,
-                      fit: BoxFit.cover,
-                    ),
+          Row(
+            children: <Widget>[
+              IconButton(
+                icon: ClipOval(
+                  child: Image.memory(
+                    profile.id != null && profile.image.isNotEmpty ? profile.image : getBlankImage(512),
+                    width: 45,
+                    height: 45,
+                    fit: BoxFit.cover,
                   ),
-                  color: Theme.of(context).colorScheme.primary,
-                  onPressed: () {
-                    selectProfile();
-                  },
                 ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                    child: TextField(
-                      controller: searchController,
-                      focusNode: searchFocusNode,
-                      decoration: InputDecoration(
-                        hintText: 'Search with a tag',
-                        suffixIcon: searchController.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(
-                                  Icons.clear,
-                                ),
-                                onPressed: () => resetSearch(),
-                              )
-                            : null,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16.0),
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: const EdgeInsets.all(16.0),
+                onPressed: () {
+                  selectProfile();
+                },
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  child: TextField(
+                    controller: searchController,
+                    focusNode: searchFocusNode,
+                    decoration: InputDecoration(
+                      hintText: 'Search with a tag',
+                      suffixIcon: searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(
+                                Icons.clear,
+                              ),
+                              onPressed: () => resetSearch(),
+                            )
+                          : null,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16.0),
                       ),
-                      onChanged: (value) {
-                        setState(() {
-                          searchItems(value.trim());
-                        });
-                      },
+                      //filled: true,
+                      //fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.all(16.0),
                     ),
+                    onChanged: (value) {
+                      setState(() {
+                        searchItems(value.trim());
+                      });
+                    },
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  color: Theme.of(context).colorScheme.primary,
-                  onPressed: () {
-                    addEditItem(0);
-                  },
-                ),
-              ],
-            ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add),
+                iconSize: 30,
+                onPressed: () {
+                  addEditItem(0);
+                },
+              ),
+            ],
           ),
         ],
       ),

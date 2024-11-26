@@ -94,7 +94,7 @@ class AddEditProfileState extends State<AddEditProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Edit Profile",style: Theme.of(context).textTheme.labelLarge),
+        title: const Text("Edit Profile",),
       ),
       body: Column(
         children: [
@@ -134,7 +134,6 @@ class AddEditProfileState extends State<AddEditProfile> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: IconButton(
-              color: Theme.of(context).colorScheme.primary,
               icon: const Icon(Icons.check),
               onPressed: () {
                 saveProfile();
